@@ -1,7 +1,206 @@
-echo "# Toilet-Reviews" >> README.md
-git init
-git add README.md
-git commit -m "first commit"
-git branch -M main
-git remote add origin https://github.com/lucasmysticmagic-del/Toilet-Reviews.git
-git push -u origin main
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LooReview | Global Toilet Ratings</title>
+    <style>
+        :root {
+            --primary: #2d5a27;
+            --secondary: #f4f4f9;
+            --accent: #ffcc00;
+            --text: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--secondary);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+        }
+
+        .rating-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .score-display {
+            float: right;
+            font-weight: normal;
+            color: var(--primary);
+        }
+
+        .average-box {
+            background: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .average-box h2 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            height: 80px;
+            box-sizing: border-box;
+            margin-top: 10px;
+        }
+
+        button {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background-color: #1e3d1a;
+        }
+
+        #reviews-list {
+            margin-top: 30px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .review-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 5px solid var(--primary);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>LooReview 🚽</h1>
+        
+        <div class="average-box">
+            <p>Overall Rating</p>
+            <h2 id="total-avg">5.0</h2>
+        </div>
+
+        <form id="review-form">
+            <div class="rating-group">
+                <label>Cleanliness <span class="score-display" id="clean-val">5</span></label>
+                <input type="range" id="cleanliness" min="1" max="5" step="0.5" value="5" oninput="updateScores()">
+            </div>
+
+            <div class="rating-group">
+                <label>Privacy <span class="score-display" id="priv-val">5</span></label>
+                <input type="range" id="privacy" min="1" max="5" step="0.5" value="5" oninput="updateScores()">
+            </div>
+
+            <div class="rating-group">
+                <label>Amenities (Soap/TP) <span class="score-display" id="amen-val">5</span></label>
+                <input type="range" id="amenities" min="1" max="5" step="0.5" value="5" oninput="updateScores()">
+            </div>
+
+            <div class="rating-group">
+                <label>Accessibility <span class="score-display" id="acc-val">5</span></label>
+                <input type="range" id="accessibility" min="1" max="5" step="0.5" value="5" oninput="updateScores()">
+            </div>
+
+            <label>Location & Comments</label>
+            <input type="text" id="location" placeholder="e.g. Airport Terminal 1" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ddd; box-sizing: border-box;" required>
+            <textarea id="comment" placeholder="Tell us about the flush power, lighting, etc..."></textarea>
+
+            <button type="submit">Submit Review</button>
+        </form>
+    </div>
+
+    <div id="reviews-list">
+        <h3>Recent Reviews</h3>
+        </div>
+
+    <script>
+        function updateScores() {
+            const c = parseFloat(document.getElementById('cleanliness').value);
+            const p = parseFloat(document.getElementById('privacy').value);
+            const a = parseFloat(document.getElementById('amenities').value);
+            const acc = parseFloat(document.getElementById('accessibility').value);
+
+            document.getElementById('clean-val').innerText = c;
+            document.getElementById('priv-val').innerText = p;
+            document.getElementById('amen-val').innerText = a;
+            document.getElementById('acc-val').innerText = acc;
+
+            const avg = (c + p + a + acc) / 4;
+            document.getElementById('total-avg').innerText = avg.toFixed(1);
+        }
+
+        document.getElementById('review-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const location = document.getElementById('location').value;
+            const comment = document.getElementById('comment').value;
+            const avg = document.getElementById('total-avg').innerText;
+
+            const reviewCard = document.createElement('div');
+            reviewCard.className = 'review-card';
+            reviewCard.innerHTML = `
+                <div class="review-header">
+                    <span>${location}</span>
+                    <span style="color: #2d5a27;">★ ${avg}</span>
+                </div>
+                <p style="margin: 5px 0 0 0; color: #666;">${comment}</p>
+            `;
+
+            document.getElementById('reviews-list').prepend(reviewCard);
+            this.reset();
+            updateScores();
+        });
+    </script>
+</body>
+</html>
